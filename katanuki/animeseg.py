@@ -14,7 +14,7 @@ from torch.cuda import amp
 from tqdm import tqdm
 from PIL import Image
 
-def single(img, background = 'Transparent'):
+def single(img, background = 'Transparent', fp32 = False):
     path = 'extensions/sd_katanuki/tmp.png'
 
     if not img:
@@ -26,7 +26,7 @@ def single(img, background = 'Transparent'):
     # なぜかファイル経由じゃないとうまく処理できない
     img.save(path)
 
-    animeseg(path)
+    animeseg(path, fp32)
 
     if background == 'White':
         white(path)
@@ -37,7 +37,7 @@ def single(img, background = 'Transparent'):
 
     return img
 
-def directory(input_dir, output_dir, background):
+def directory(input_dir, output_dir, background, fp32 = False):
     if not input_dir:
         print("input_dir needed.")
         return
@@ -50,18 +50,18 @@ def directory(input_dir, output_dir, background):
 
     # output_dirの全ファイルを処理
     for i, path in enumerate(tqdm(sorted(glob.glob(f"{output_dir}/*.*")))):
-        animeseg(path)
+        animeseg(path, fp32)
 
         if background == 'White':
             white(path)
 
-def animeseg(path):
+def animeseg(path, fp32):
     class Opt(object):
         def __init__(self):
             self.net = 'isnet_is'
             self.ckpt = 'extensions/sd_katanuki/anime-seg/isnetis.ckpt'
             self.device = 'cuda:0'
-            self.fp32   = False
+            self.fp32   = fp32
             self.img_size = 1024
     opt = Opt()
 

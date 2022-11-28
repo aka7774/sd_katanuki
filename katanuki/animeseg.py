@@ -3,6 +3,7 @@ import gradio as gr
 from modules import script_callbacks
 
 import os
+import shutil
 
 import argparse
 import cv2
@@ -35,6 +36,24 @@ def single(img, background = 'Transparent'):
     print(f"{path} saved.")
 
     return img
+
+def directory(input_dir, output_dir, background):
+    if not input_dir:
+        print("input_dir needed.")
+        return
+
+    # output_dirに加工前のファイルをまとめる
+    if not output_dir:
+        output_dir = input_dir
+    else:
+        shutil.copytree(input_dir, output_dir, dirs_exist_ok=True)
+
+    # output_dirの全ファイルを処理
+    for i, path in enumerate(tqdm(sorted(glob.glob(f"{output_dir}/*.*")))):
+        animeseg(path)
+
+        if background == 'White':
+            white(path)
 
 def animeseg(path):
     class Opt(object):

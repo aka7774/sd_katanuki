@@ -8,7 +8,7 @@ import glob
 from torch.cuda import amp
 from tqdm import tqdm
 
-from train import AnimeSegmentation
+from .train import AnimeSegmentation
 
 
 def get_mask(model, input_img, use_amp=True, s=640):

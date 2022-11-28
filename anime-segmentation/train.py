@@ -7,8 +7,8 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
-from data_loader import create_training_datasets
-from model import ISNetDIS, ISNetGTEncoder, U2NET, U2NET_full2, U2NET_lite2, MODNet
+from .data_loader import create_training_datasets
+from .model import ISNetDIS, ISNetGTEncoder, U2NET, U2NET_full2, U2NET_lite2, MODNet
 import pytorch_lightning as pl
 import warnings
 

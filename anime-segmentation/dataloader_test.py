@@ -4,7 +4,7 @@ import time
 
 import cv2
 from torch.utils.data import DataLoader
-from data_loader import create_training_datasets
+from .data_loader import create_training_datasets
 
 import numpy as np
 

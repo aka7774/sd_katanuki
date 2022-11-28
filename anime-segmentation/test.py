@@ -8,9 +8,9 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from tqdm.asyncio import tqdm
 
-from data_loader import create_training_datasets
-from train import AnimeSegmentation
-from inference import get_mask
+from .data_loader import create_training_datasets
+from .train import AnimeSegmentation
+from .inference import get_mask
 import warnings
 
 

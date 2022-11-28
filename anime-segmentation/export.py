@@ -1,7 +1,7 @@
 import argparse
 import torch
 
-from train import AnimeSegmentation
+from .train import AnimeSegmentation
 
 
 def export_onnx(model, img_size, path):

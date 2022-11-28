@@ -16,7 +16,7 @@ def on_ui_tabs():
                 dst_image = gr.Image(label="Result", interactive=False, type="pil")
 
         src_image.change(
-            fn=animeseg.run,
+            fn=animeseg.single,
             inputs=[src_image, background],
             outputs=[dst_image],
         )

@@ -13,7 +13,7 @@ from torch.cuda import amp
 from tqdm import tqdm
 from PIL import Image
 
-def run(img):
+def run(img, background = 'Transparent'):
     class Opt(object):
         def __init__(self):
             self.net = 'isnet_is'
@@ -47,8 +47,26 @@ def run(img):
     img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
     cv2.imwrite(path, img)
-    img = Image.open(path)
 
+    if background == 'White':
+        # 画像を読み込んでNumPy配列を作成
+        image_array = np.array(Image.open(path))
+        # image_array = cv2.imread(IMAGE_PATH, -1)
+
+        B, G, R, A = cv2.split(image_array)
+        alpha = A / 255
+
+        R = (255 * (1 - alpha) + R * alpha).astype(np.uint8)
+        G = (255 * (1 - alpha) + G * alpha).astype(np.uint8)
+        B = (255 * (1 - alpha) + B * alpha).astype(np.uint8)
+
+        image = cv2.merge((B, G, R))
+
+        # アルファチャンネルのみの画像を作成して保存
+        alpha_image = Image.fromarray(image)
+        alpha_image.save(path)
+
+    img = Image.open(path)
     try:
         os.remove(path)
     except:

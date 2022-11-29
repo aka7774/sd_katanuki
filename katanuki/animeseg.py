@@ -15,6 +15,8 @@ from torch.cuda import amp
 from tqdm import tqdm
 from PIL import Image
 
+from modules.devices import get_optimal_device
+
 def single(img, background = 'Transparent', fp32 = False):
     p = pathlib.Path(__file__).parts[-4:-2]
     path = os.path.abspath(f"{p[0]}/{p[1]}/tmp.png")
@@ -54,11 +56,13 @@ def directory(input_dir, output_dir, background, fp32 = False):
 def animeseg(path, background = 'Transparent', fp32 = False):
     p = pathlib.Path(__file__).parts[-4:-2]
 
+    device = get_optimal_device()
+
     class Opt(object):
         def __init__(self):
             self.net = 'isnet_is'
             self.ckpt = f"{p[0]}/{p[1]}/anime-seg/isnetis.ckpt"
-            self.device = 'cuda:0'
+            self.device = str(device)
             self.fp32   = fp32
             self.img_size = 1024
     opt = Opt()
@@ -69,8 +73,6 @@ def animeseg(path, background = 'Transparent', fp32 = False):
     train = importlib.import_module(f"{p[0]}.{p[1]}.anime-segmentation.train")
     AnimeSegmentation = getattr(train, 'AnimeSegmentation')
     
-    device = torch.device(opt.device)
-
     model = AnimeSegmentation.try_load(opt.net, opt.ckpt, opt.device)
     model.eval()
     model.to(device)

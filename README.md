@@ -21,6 +21,8 @@ torch, torchvisionのインストーラーは用意していません。
 
 # Usage
 
+- GTX 16X0の人は右上のFP32をチェック
+
 ## Single
 
 - drop Image

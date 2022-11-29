@@ -19,6 +19,8 @@ torch, torchvisionのインストーラーは用意していません。
 - torch==1.12.1+cu116
 - torchvision==0.13.1+cu116
 
+残念ながらCPUでは動作しないようです。
+
 # Usage
 
 - GTX 16X0の人は右上のFP32をチェック

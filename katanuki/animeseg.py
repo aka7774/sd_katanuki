@@ -4,6 +4,7 @@ from modules import script_callbacks
 
 import os
 import shutil
+import pathlib
 
 import argparse
 import cv2
@@ -15,7 +16,8 @@ from tqdm import tqdm
 from PIL import Image
 
 def single(img, background = 'Transparent', fp32 = False):
-    path = 'extensions/sd_katanuki/tmp.png'
+    p = pathlib.Path(__file__).parts[-4:-2]
+    path = os.path.abspath(f"{p[0]}/{p[1]}/tmp.png")
 
     if not img:
         if os.path.exists(path):
@@ -50,19 +52,21 @@ def directory(input_dir, output_dir, background, fp32 = False):
         animeseg(path, background, fp32)
 
 def animeseg(path, background = 'Transparent', fp32 = False):
+    p = pathlib.Path(__file__).parts[-4:-2]
+
     class Opt(object):
         def __init__(self):
             self.net = 'isnet_is'
-            self.ckpt = 'extensions/sd_katanuki/anime-seg/isnetis.ckpt'
+            self.ckpt = f"{p[0]}/{p[1]}/anime-seg/isnetis.ckpt"
             self.device = 'cuda:0'
             self.fp32   = fp32
             self.img_size = 1024
     opt = Opt()
 
     import importlib
-    inference = importlib.import_module("extensions.sd_katanuki.anime-segmentation.inference")
+    inference = importlib.import_module(f"{p[0]}.{p[1]}.anime-segmentation.inference")
     get_mask = getattr(inference, 'get_mask')
-    train = importlib.import_module("extensions.sd_katanuki.anime-segmentation.train")
+    train = importlib.import_module(f"{p[0]}.{p[1]}.anime-segmentation.train")
     AnimeSegmentation = getattr(train, 'AnimeSegmentation')
     
     device = torch.device(opt.device)

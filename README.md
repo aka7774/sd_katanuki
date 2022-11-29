@@ -1,6 +1,23 @@
 # sd_katanuki
 Anime Image Background Remover for AUTOMATIC1111
 
+# Install
+
+torch, torchvisionのインストーラーは用意していません。
+
+情報によると、以下のバージョンで動くようです。
+
+- torch==1.12.1+cu113
+- torchvision==0.13.1+cu113
+
+以下のバージョンでは動かないようです。
+
+- torch==1.10.2
+
+私の環境では、以下のバージョンを使っています。
+
+- torch==1.12.1+cu116
+- torchvision==0.13.1+cu116
 
 # Usage
 

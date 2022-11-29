@@ -26,14 +26,11 @@ def single(img, background = 'Transparent', fp32 = False):
     # なぜかファイル経由じゃないとうまく処理できない
     img.save(path)
 
-    animeseg(path, fp32)
-
-    if background == 'White':
-        white(path)
-
-    img = Image.open(path)
+    animeseg(path, background, fp32)
 
     print(f"{path} saved.")
+
+    img = Image.open(path)
 
     return img
 
@@ -50,12 +47,9 @@ def directory(input_dir, output_dir, background, fp32 = False):
 
     # output_dirの全ファイルを処理
     for i, path in enumerate(tqdm(sorted(glob.glob(f"{output_dir}/*.*")))):
-        animeseg(path, fp32)
+        animeseg(path, background, fp32)
 
-        if background == 'White':
-            white(path)
-
-def animeseg(path, fp32):
+def animeseg(path, background = 'Transparent', fp32 = False):
     class Opt(object):
         def __init__(self):
             self.net = 'isnet_is'
@@ -81,22 +75,23 @@ def animeseg(path, fp32):
     mask = get_mask(model, img, use_amp=not opt.fp32, s=opt.img_size)
     img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
-    cv2.imwrite(path, img)
 
-def white(path):
-    # 画像を読み込んでNumPy配列を作成
-    image_array = np.array(Image.open(path))
-    # image_array = cv2.imread(IMAGE_PATH, -1)
+    if background != 'White':
+        cv2.imwrite(path, img)
 
-    B, G, R, A = cv2.split(image_array)
-    alpha = A / 255
+    if background == 'White':
+        # 画像を読み込んでNumPy配列を作成
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
-    R = (255 * (1 - alpha) + R * alpha).astype(np.uint8)
-    G = (255 * (1 - alpha) + G * alpha).astype(np.uint8)
-    B = (255 * (1 - alpha) + B * alpha).astype(np.uint8)
+        B, G, R, A = cv2.split(img)
+        alpha = A / 255
 
-    image = cv2.merge((B, G, R))
+        R = (255 * (1 - alpha) + R * alpha).astype(np.uint8)
+        G = (255 * (1 - alpha) + G * alpha).astype(np.uint8)
+        B = (255 * (1 - alpha) + B * alpha).astype(np.uint8)
 
-    # アルファチャンネルのみの画像を作成して保存
-    alpha_image = Image.fromarray(image)
-    alpha_image.save(path)
+        image = cv2.merge((B, G, R))
+
+        # アルファチャンネルのみの画像を作成して保存
+        alpha_image = Image.fromarray(image)
+        alpha_image.save(path)

@@ -3,7 +3,13 @@ Anime Image Background Remover for AUTOMATIC1111
 
 # Install
 
+以下のリポジトリ(400MB弱)を別途ダウンロードします。
+
+- https://huggingface.co/skytnt/anime-seg
+
 torch, torchvisionのインストーラーは用意していません。
+
+# Requirement
 
 情報によると、以下のバージョンで動くようです。
 

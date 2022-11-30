@@ -3,7 +3,7 @@ Anime Image Background Remover for AUTOMATIC1111
 
 # Install
 
-以下のリポジトリ(400MB弱)を別途ダウンロードします。
+以下のリポジトリ(400MB弱)を別途自動ダウンロードします。
 
 - https://huggingface.co/skytnt/anime-seg
 

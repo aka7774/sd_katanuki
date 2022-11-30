@@ -50,7 +50,6 @@ Dreamboothのデータセット画像作るのに白背景にする作業の流�
 以下のリポジトリの内容を改変したものが含まれています。
 
 - https://github.com/SkyTNT/anime-segmentation
-- https://huggingface.co/skytnt/anime-seg
 
 - git submoduleは1111のExtensionインストーラーが対応していなかった。
 - 1111のinstall.pyは経過をリアルタイム表示できないので好きくない。

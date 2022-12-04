@@ -7,6 +7,8 @@ Anime Image Background Remover for AUTOMATIC1111
 
 - https://huggingface.co/skytnt/anime-seg
 
+失敗することが結構あるっぽいのでダメそうなら手動で上書きお願いします。
+
 torch, torchvisionのインストーラーは用意していません。
 
 # Requirement

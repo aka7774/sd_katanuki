@@ -41,11 +41,12 @@ torch, torchvisionのインストーラーは用意していません。
 
 Dreamboothのデータセット画像作るのに白背景にする作業の流れ
 
-+ webui直下に katanuki フォルダを作る(名前はなんでもいい)
++ webui直下に katanuki_input と katanuki_output フォルダを作る(名前はなんでもいい)
 + フォルダの中に画像を入れる(この画像が上書きされる)
 + Background で White を選ぶ
-+ Directory タブの Input Directory に katanuki と入れて Run
-+ 1111で確認したかったら Image Browser 入れて Others の Images directory に katanuki と入れる
++ Directory タブの Input Directory に katanuki_input と入れる
++ Directory タブの Output Directory に katanuki_output と入れて Run
++ 1111で確認したかったら Image Browser 入れて Others の Images directory に katanuki_output と入れる
 
 ## Include anime-segmentation
 

@@ -39,7 +39,7 @@ torch, torchvisionのインストーラーは用意していません。
 
 ## Directory
 
-Dreamboothのデータセット画像作るのに白背景にする作業の流れ
+例: Dreamboothのデータセット画像作るのに白背景にする作業の流れ
 
 + webui直下に katanuki_input と katanuki_output フォルダを作る(名前はなんでもいい)
 + フォルダの中に画像を入れる(この画像が上書きされる)

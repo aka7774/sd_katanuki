@@ -8,7 +8,7 @@ import modules.shared as shared
 def on_ui_tabs():
     with gr.Blocks() as katanuki_interface:
         with gr.Row(equal_height=True):
-            background = gr.Radio(choices=["Transparent", "White"], value="Transparent", label="Background")
+            background = gr.Radio(choices=["Transparent", "White", "Mask"], value="Transparent", label="Background")
             fp32 = gr.Checkbox(label="Use FP32(for 16X0)")
         with gr.Tabs(elem_id="katanuki"):
             with gr.TabItem('Single Image'):

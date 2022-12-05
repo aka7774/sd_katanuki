@@ -79,13 +79,19 @@ def animeseg(path, background = 'Transparent', fp32 = False):
 
     img = cv2.cvtColor(cv2.imread(path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
     mask = get_mask(model, img, use_amp=not opt.fp32, s=opt.img_size)
-    img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
-
-    if background != 'White':
+    
+    # 背景が黒でキャラが白
+    if background == 'Mask':
+        img = np.concatenate((img, mask * img, mask.repeat(3, 2) * 255), axis=1).astype(np.uint8)
+        h, w, ch = img.shape
+        img = img[0:, round(w*2/3):, :]
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imwrite(path, img)
-
-    if background == 'White':
+    elif background == 'Transparent':
+        img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+        cv2.imwrite(path, img)
+    elif background == 'White':
         # 画像を読み込んでNumPy配列を作成
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 

@@ -101,7 +101,7 @@ def animeseg(path, background = 'Transparent', fp32 = False, alt_mode = True):
         cv2.imwrite(path, img)
     elif background == 'White':
         # 画像を読み込んでNumPy配列を作成
-        img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
+        img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
         if alt_mode:

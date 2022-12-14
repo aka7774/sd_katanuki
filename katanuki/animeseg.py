@@ -17,7 +17,7 @@ from PIL import Image
 
 from modules.devices import get_optimal_device
 
-def single(img, background = 'Transparent', fp32 = False):
+def single(img, background = 'Transparent', fp32 = False, alt_mode = True):
     p = pathlib.Path(__file__).parts[-4:-2]
     path = os.path.abspath(f"{p[0]}/{p[1]}/tmp.png")
 
@@ -30,7 +30,7 @@ def single(img, background = 'Transparent', fp32 = False):
     # なぜかファイル経由じゃないとうまく処理できない
     img.save(path)
 
-    animeseg(path, background, fp32)
+    animeseg(path, background, fp32, alt_mode)
 
     print(f"{path} saved.")
 
@@ -38,7 +38,7 @@ def single(img, background = 'Transparent', fp32 = False):
 
     return img
 
-def directory(input_dir, output_dir, background, fp32 = False):
+def directory(input_dir, output_dir, background, fp32 = False, alt_mode = True):
     if not input_dir:
         print("input_dir needed.")
         return
@@ -51,9 +51,9 @@ def directory(input_dir, output_dir, background, fp32 = False):
 
     # output_dirの全ファイルを処理
     for i, path in enumerate(tqdm(sorted(glob.glob(f"{output_dir}/*.*")))):
-        animeseg(path, background, fp32)
+        animeseg(path, background, fp32, alt_mode)
 
-def animeseg(path, background = 'Transparent', fp32 = False):
+def animeseg(path, background = 'Transparent', fp32 = False, alt_mode = True):
     p = pathlib.Path(__file__).parts[-4:-2]
 
     device = get_optimal_device()
@@ -79,7 +79,7 @@ def animeseg(path, background = 'Transparent', fp32 = False):
 
     img = cv2.cvtColor(cv2.imread(path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
     mask = get_mask(model, img, use_amp=not opt.fp32, s=opt.img_size)
-    
+
     # 背景が黒でキャラが白
     if background == 'Mask':
         img = np.concatenate((img, mask * img, mask.repeat(3, 2) * 255), axis=1).astype(np.uint8)
@@ -88,14 +88,27 @@ def animeseg(path, background = 'Transparent', fp32 = False):
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imwrite(path, img)
     elif background == 'Transparent':
-        img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
+        if alt_mode:
+            # anime-segのonly_mattedの実装
+            img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
+        else:
+            # anime-segのelse(jpeg出力)の実装
+            img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+        cv2.imwrite(path, img)
+    elif background == 'Black':
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
         cv2.imwrite(path, img)
     elif background == 'White':
         # 画像を読み込んでNumPy配列を作成
+        img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
-        B, G, R, A = cv2.split(img)
+        if alt_mode:
+            # なんでこれで直るのかわからんけどなぜかうまくいく
+            R, G, B, A = cv2.split(img)
+        else:
+            B, G, R, A = cv2.split(img)
         alpha = A / 255
 
         R = (255 * (1 - alpha) + R * alpha).astype(np.uint8)

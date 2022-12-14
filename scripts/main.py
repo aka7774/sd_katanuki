@@ -10,6 +10,7 @@ def on_ui_tabs():
         with gr.Row(equal_height=True):
             background = gr.Radio(choices=["Transparent", "White", "Mask"], value="Transparent", label="Background")
             fp32 = gr.Checkbox(label="Use FP32(for 16X0)")
+            alt_mode = gr.Checkbox(value=True, label="Alt mode")
         with gr.Tabs(elem_id="katanuki"):
             with gr.TabItem('Single Image'):
 
@@ -25,13 +26,13 @@ def on_ui_tabs():
 
         src_image.change(
             fn=animeseg.single,
-            inputs=[src_image, background, fp32],
+            inputs=[src_image, background, fp32, alt_mode],
             outputs=[dst_image],
         )
 
         dir_run.click(
             fn=animeseg.directory,
-            inputs=[input_dir, output_dir, background, fp32]
+            inputs=[input_dir, output_dir, background, fp32, alt_mode]
         )
 
     return (katanuki_interface, "Katanuki", "katanuki_interface"),

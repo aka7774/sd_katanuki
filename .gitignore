@@ -1,5 +1,6 @@
 anime-seg/
 tmp.png
+isnetis.ckpt.checked
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -15,9 +15,9 @@ from PIL import Image
 
 from modules.devices import get_optimal_device
 
-def single(img, background = 'Transparent', fp32 = False, alt_mode = True):
+def single(img, background = 'Transparent', fp32 = False, alt_mode = True, filename = 'tmp.png'):
     p = pathlib.Path(__file__).parts[-4:-2]
-    path = os.path.abspath(f"{p[0]}/{p[1]}/tmp.png")
+    path = os.path.abspath(f"{p[0]}/{p[1]}/{filename}")
 
     if not img:
         if os.path.exists(path):

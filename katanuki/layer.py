@@ -11,7 +11,7 @@ import cv2
 import torch
 import numpy as np
 from torch.cuda import amp
-from PIL import Image
+from PIL import Image, ImageOps
 
 from modules.devices import get_optimal_device
 
@@ -38,17 +38,19 @@ def reset():
     animeseg.single(None, '', False, False, 'layer.png')
     animeseg.single(None, '', False, False, 'tmp.png')
 
-def merge(merged_path, layer_path, left = 0, top = 0, scale = 1):
+def merge(merged_path, layer_path, left = 0, top = 0, scale = 1, mirror = False):
     base = Image.open(merged_path)
     layer = Image.open(layer_path)
 
     if scale != 1:
         layer = layer.resize((int(layer.size[0] * scale), int(layer.size[1] * scale)))
+    if mirror:
+        layer = ImageOps.mirror(layer)
 
     base.paste(layer, (left, top), layer)
     return base
 
-def slide(left, top, scale):
+def slide(left, top, scale, mirror):
     p = pathlib.Path(__file__).parts[-4:-2]
     merged_path = os.path.abspath(f"{p[0]}/{p[1]}/merged.png")
     layer_path = os.path.abspath(f"{p[0]}/{p[1]}/layer.png")
@@ -59,7 +61,7 @@ def slide(left, top, scale):
     if not os.path.exists(layer_path):
         raise ValueError(f"Not found {layer_path}")
 
-    img = merge(merged_path, layer_path, left, top, scale)
+    img = merge(merged_path, layer_path, left, top, scale, mirror)
     img.save(tmp_path)
 
     return img

@@ -56,6 +56,7 @@ def on_ui_tabs():
                 step=0.05,
                 label='Scale'
                 )
+                layer_mirror = gr.Checkbox(label="Mirror")
                 layer_merge = gr.Button("Merge")
                 layer_dst_image = gr.Image(label="Result", source="upload", interactive=False, type="pil")
 
@@ -84,7 +85,7 @@ def on_ui_tabs():
 
         layer_merge.click(
             fn=layer.slide,
-            inputs=[layer_position_x, layer_position_y, layer_scale],
+            inputs=[layer_position_x, layer_position_y, layer_scale, layer_mirror],
             outputs=[layer_dst_image],
         )
 

@@ -5,6 +5,7 @@ from modules import script_callbacks
 import os
 import shutil
 import pathlib
+import tqdm
 
 import argparse
 import cv2
@@ -50,7 +51,7 @@ def directory(input_dir, output_dir, background, fp32 = False, alt_mode = True):
         os.makedirs(output_dir)
 
     # 全ファイルを処理
-    for filename in os.listdir(input_dir):
+    for filename in tqdm.tqdm(os.listdir(input_dir)):
         src_path = os.path.join(input_dir, filename)
         dst_path = os.path.join(output_dir, filename)
         animeseg(src_path, dst_path, background, fp32, alt_mode)

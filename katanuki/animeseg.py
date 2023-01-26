@@ -55,11 +55,11 @@ def directory(input_dir, output_dir, background, fp32 = False, alt_mode = True, 
     # 全ファイルを処理
     for filename in tqdm.tqdm(os.listdir(input_dir)):
         src_path = os.path.join(input_dir, filename)
-        dst_path = os.path.join(output_dir, filename)
+        stem, ext = os.path.splitext(filename)
+        dst_path = os.path.join(output_dir, f"{stem}.png")
         animeseg(src_path, dst_path, background, fp32, alt_mode)
         if int(width) > 0 and int(height) > 0:
-            stem, ext = os.path.splitext(dst_path)
-            expand2square(f"{stem}.png", background, int(width), int(height))
+            expand2square(dst_path, background, int(width), int(height))
 
 def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_mode = True):
     p = pathlib.Path(__file__).parts[-4:-2]
@@ -86,8 +86,9 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
     model.to(device)
 
     im = Image.open(src_path)
-    img = np.array(im, dtype=np.uint8)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    imn = np.array(im, dtype=np.uint8)
+    img = cv2.cvtColor(imn, cv2.COLOR_RGB2BGR)
+    #img = cv2.cvtColor(cv2.imread(src_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
     mask = get_mask(model, img, use_amp=not opt.fp32, s=opt.img_size)
 
     # 背景が黒でキャラが白
@@ -95,7 +96,6 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
         img = np.concatenate((img, mask * img, mask.repeat(3, 2) * 255), axis=1).astype(np.uint8)
         h, w, ch = img.shape
         img = img[0:, round(w*2/3):, :]
-#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         imwrite(dst_path, img)
     elif background == 'Transparent':
         if alt_mode:
@@ -104,15 +104,13 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
         else:
             # anime-segのelse(jpeg出力)の実装
             img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
-#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+
         imwrite(dst_path, img)
     elif background == 'Black':
-#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
         imwrite(dst_path, img)
     elif background == 'White':
         # 画像を読み込んでNumPy配列を作成
         img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
-#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
         if alt_mode:
             # なんでこれで直るのかわからんけどなぜかうまくいく

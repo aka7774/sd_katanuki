@@ -90,7 +90,7 @@ def upload(img, background = 'Transparent', fp32 = False, alt_mode = True):
         shutil.copyfile(tmp_path, merged_path)
 
     # 2枚目以降の画像が来た
-    img = animeseg.single(img, background, fp32, alt_mode, 'layer.png')
+    img = animeseg.single(img, background, fp32, alt_mode, 0, 0, 'layer.png')
     img = merge(merged_path, layer_path)
     img.save(tmp_path)
 

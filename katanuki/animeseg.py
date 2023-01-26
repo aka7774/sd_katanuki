@@ -16,9 +16,9 @@ from PIL import Image
 
 from modules.devices import get_optimal_device
 
-def single(img, background = 'Transparent', fp32 = False, alt_mode = True, filename = 'tmp.png'):
+def single(img, background = 'Transparent', fp32 = False, alt_mode = True, width = 0, height = 0, filename = 'tmp.png'):
     p = pathlib.Path(__file__).parts[-4:-2]
-    path = os.path.abspath(f"{p[0]}/{p[1]}/{filename}")
+    path = os.path.abspath(os.path.join(p[0], p[1], filename))
 
     if not img:
         if os.path.exists(path):
@@ -30,6 +30,8 @@ def single(img, background = 'Transparent', fp32 = False, alt_mode = True, filen
     img.save(path)
 
     animeseg(path, path, background, fp32, alt_mode)
+    if int(width) > 0 and int(height) > 0:
+        expand2square(path, background, int(width), int(height))
 
     print(f"{path} saved.")
 
@@ -37,7 +39,7 @@ def single(img, background = 'Transparent', fp32 = False, alt_mode = True, filen
 
     return img
 
-def directory(input_dir, output_dir, background, fp32 = False, alt_mode = True):
+def directory(input_dir, output_dir, background, fp32 = False, alt_mode = True, width = 0, height = 0):
     if not input_dir:
         raise ValueError("Please input Input_dir")
         return
@@ -55,6 +57,9 @@ def directory(input_dir, output_dir, background, fp32 = False, alt_mode = True):
         src_path = os.path.join(input_dir, filename)
         dst_path = os.path.join(output_dir, filename)
         animeseg(src_path, dst_path, background, fp32, alt_mode)
+        if int(width) > 0 and int(height) > 0:
+            stem, ext = os.path.splitext(dst_path)
+            expand2square(f"{stem}.png", background, int(width), int(height))
 
 def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_mode = True):
     p = pathlib.Path(__file__).parts[-4:-2]
@@ -80,7 +85,9 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
     model.eval()
     model.to(device)
 
-    img = cv2.cvtColor(cv2.imread(src_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+    im = Image.open(src_path)
+    img = np.array(im, dtype=np.uint8)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     mask = get_mask(model, img, use_amp=not opt.fp32, s=opt.img_size)
 
     # 背景が黒でキャラが白
@@ -88,8 +95,8 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
         img = np.concatenate((img, mask * img, mask.repeat(3, 2) * 255), axis=1).astype(np.uint8)
         h, w, ch = img.shape
         img = img[0:, round(w*2/3):, :]
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(dst_path, img)
+#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        imwrite(dst_path, img)
     elif background == 'Transparent':
         if alt_mode:
             # anime-segのonly_mattedの実装
@@ -97,15 +104,15 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
         else:
             # anime-segのelse(jpeg出力)の実装
             img = np.concatenate((mask * img, mask * 255), axis=2).astype(np.uint8)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
-        cv2.imwrite(dst_path, img)
+#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+        imwrite(dst_path, img)
     elif background == 'Black':
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
-        cv2.imwrite(dst_path, img)
+#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+        imwrite(dst_path, img)
     elif background == 'White':
         # 画像を読み込んでNumPy配列を作成
         img = np.concatenate((mask * img + 1 - mask, mask * 255), axis=2).astype(np.uint8)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
+#        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGRA)
 
         if alt_mode:
             # なんでこれで直るのかわからんけどなぜかうまくいく
@@ -123,3 +130,37 @@ def animeseg(src_path, dst_path, background = 'Transparent', fp32 = False, alt_m
         # アルファチャンネルのみの画像を作成して保存
         alpha_image = Image.fromarray(image)
         alpha_image.save(dst_path)
+
+def expand2square(path, background, canvas_width, canvas_height):
+    if background == 'White':
+        color = (255, 255, 255)
+    else:
+        color = (0, 0, 0)
+
+    canvas = Image.new('RGB', (canvas_width, canvas_height), color)
+
+    if background == 'Transparent':
+        canvas.putalpha(0)
+
+    im = Image.open(path)
+    width, height = im.size
+    if canvas_width <= width and canvas_height <= height:
+        pass
+    else:
+        canvas.paste(im, ((canvas_width - width) // 2, (canvas_height - height) // 2))
+        canvas.save(path, quality=95)
+
+def imwrite(filename, img, params=None):
+    try:
+        stem, ext = os.path.splitext(filename)
+        result, n = cv2.imencode('.png', img, params)
+
+        if result:
+            with open(f"{stem}.png", mode='w+b') as f:
+                n.tofile(f)
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        return False

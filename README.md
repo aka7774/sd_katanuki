@@ -1,6 +1,12 @@
 # sd_katanuki
 Anime Image Background Remover for AUTOMATIC1111
 
+# Changelog
+
+- 日本語のファイル名に対応しました(OpenCVのバグ?らしい)
+- Expand Canvas機能を追加(いるのかわからんけど)
+  - アス比を維持したまま画像の縦横をでかく揃えるのに使えます
+
 # Install
 
 以下のリポジトリ(400MB弱)を別途自動ダウンロードします。
@@ -9,21 +15,9 @@ Anime Image Background Remover for AUTOMATIC1111
 
 失敗することが結構あるっぽいのでダメそうなら手動で上書きお願いします。
 
-torch, torchvisionのインストーラーは用意していません。
-
 # Requirement
 
-***画像のファイル名に日本語とか入れないようにお願いします(動かないらしい)***
-
-情報によると、以下のバージョンで動くようです。
-
-- torch==1.12.1+cu113
-- torchvision==0.13.1+cu113
-
-私の環境では、以下のバージョンを使っています。
-
-- torch==1.12.1+cu116
-- torchvision==0.13.1+cu116
+torchは1111推奨のバージョンを使うことにします。
 
 残念ながらCPUでは動作しないようです。
 
@@ -45,11 +39,11 @@ torch, torchvisionのインストーラーは用意していません。
 例: Dreamboothのデータセット画像作るのに白背景にする作業の流れ
 
 + webui直下に katanuki_input と katanuki_output フォルダを作る(名前はなんでもいい)
-+ フォルダの中に画像を入れる(この画像が上書きされる)
++ フォルダの中に画像を入れる
 + Background で White を選ぶ
 + Directory タブの Input Directory に katanuki_input と入れる
 + Directory タブの Output Directory に katanuki_output と入れて Run
-+ 1111で確認したかったら Image Browser 入れて Others の Images directory に katanuki_output と入れる
++ 1111で確認したかったら Images Browser 入れて Others の Images directory に katanuki_output と入れる
 
 ## Include anime-segmentation
 
